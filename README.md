@@ -4,7 +4,7 @@
 
 **The problem**:  You don't have access to the user's session on the media domain and can't authenticate or authorize media access.
 
-**The solution**: You handle medial URLs with a expiring token attached which temporarily authorizes access and can be refreshed via redirects when needed.
+**The solution**: You handle media URLs with an expiring token attached which temporarily authorizes access and can be refreshed via redirects when needed.
 
 
 ## HTTP View
