@@ -1,0 +1,10 @@
+venv
+.tox/*
+*.egg-info/
+.vscode
+build/
+dist/
+htmlcov/
+__pycache__
+*.pyc
+.coverage
