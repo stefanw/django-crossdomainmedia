@@ -115,9 +115,16 @@ class CrossDomainMediaAuth:
             raise
 
     def get_file_path(self, request):
+        '''
+        In DEBUG mode check permission or token
+        '''
         if self.is_media_public() or self.has_perm(request):
             return self.get_media_file_path()
-        raise PermissionDenied
+        try:
+            self.check_token_request(request)
+            return self.get_media_file_path()
+        except Exception:
+            raise PermissionDenied
 
     def get_full_media_url(self, authorized=False):
         url = self.get_media_url()
