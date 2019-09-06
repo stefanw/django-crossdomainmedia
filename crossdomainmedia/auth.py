@@ -136,6 +136,7 @@ class CrossDomainMediaAuth:
         return TimestampSigner(sep=self.SIGNING_SEPARATOR)
 
     def sign_path(self, path):
+        path = self.get_path_to_sign(path)
         SEP = self.SIGNING_SEPARATOR
         signer = self.get_signer()
         return SEP.join(signer.sign(path).rsplit(SEP, 2)[-2:])
@@ -146,6 +147,9 @@ class CrossDomainMediaAuth:
             self.sign_path,
             self.TOKEN_NAME
         )
+
+    def get_path_to_sign(self, path):
+        return path
 
     def get_token(self, request):
         return request.GET.get(self.TOKEN_NAME)
@@ -161,7 +165,9 @@ class CrossDomainMediaAuth:
         if token is None:
             raise MissingToken()
 
-        path = self.get_media_url_path()
+        path = self.get_path_to_sign(
+            self.get_media_url_path()
+        )
         # Reconstruct original signature
         original = '{}:{}'.format(path, token)
         signer = self.get_signer()
