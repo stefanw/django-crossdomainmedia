@@ -1,20 +1,21 @@
-from django.http import HttpResponse
-from django.shortcuts import redirect
+from urllib.parse import urlparse
+
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.views.static import serve
 
-from .auth import (
-    CrossDomainMediaAuth, MissingToken, BadToken, ExpiredToken
-)
+from .auth import BadToken, CrossDomainMediaAuth, ExpiredToken, MissingToken
 from .utils import send_internal_file
 
 
-class CrossDomainMediaMixin():
+class CrossDomainMediaMixin:
     media_auth_class = CrossDomainMediaAuth
 
     def is_media_host(self, mauth):
-        return self.request.get_host() in settings.MEDIA_URL
+        media_host = urlparse(settings.MEDIA_URL).netloc
+        return self.request.get_host() == media_host
 
     def invalid_token(self, mauth):
         return HttpResponse(status=403)
@@ -34,9 +35,7 @@ class CrossDomainMediaMixin():
 
     def serve_media(self, mauth):
         url = mauth.get_file_path(self.request)
-        return serve(
-            self.request, url, settings.MEDIA_ROOT
-        )
+        return serve(self.request, url, settings.MEDIA_ROOT)
 
     def render_to_response(self, context):
         mauth = self.media_auth_class(context)
@@ -55,12 +54,12 @@ class CrossDomainMediaMixin():
             return self.unauthorized(mauth)
 
     def respond_media(self, mauth):
-        '''
+        """
         Request on media host should either
         - serve the media
         - deny access
         - redirect back to app for authentication
-        '''
+        """
         try:
             return self.send_media_file(mauth)
         except ExpiredToken:
@@ -71,12 +70,12 @@ class CrossDomainMediaMixin():
             return self.invalid_token(mauth)
 
     def respond_web(self, mauth):
-        '''
+        """
         Request on web should always redirect or deny
         - redirect to media unauthorized for public access
         - redirect to media with token when authorized
         - deny when not authorized
-        '''
+        """
 
         try:
             return self.redirect_to_media(mauth)
