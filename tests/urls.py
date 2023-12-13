@@ -1,12 +1,16 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from .views import AttachmentFileDetailView, ExpiredAttachmentFileDetailView
 
 urlpatterns = [
-    url(r'^attachment/(?P<name>.+)',
+    re_path(
+        r"^attachment/(?P<name>.+)",
         AttachmentFileDetailView.as_view(),
-        name='attachment_file'),
-    url(r'^attachment-expired/(?P<name>.+)',
+        name="attachment_file",
+    ),
+    re_path(
+        r"^attachment-expired/(?P<name>.+)",
         ExpiredAttachmentFileDetailView.as_view(),
-        name='attachment_file_expired')
+        name="attachment_file_expired",
+    ),
 ]
